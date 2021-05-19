@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:provider/provider.dart';
-import 'package:qr_reader/pages/addresses_page.dart';
 
-import 'package:qr_reader/pages/maps_page.dart';
+import 'package:provider/provider.dart';
+
+import 'package:qr_reader/providers/scan_list_provider.dart';
 import 'package:qr_reader/providers/ui_provider.dart';
+import 'package:qr_reader/widgets/item_builder_widget.dart';
 
 class HomePage extends StatelessWidget {
   final _appBar = AppBar(
@@ -19,18 +20,25 @@ class HomePage extends StatelessWidget {
     ],
   );
 
-  final _scanButton = FloatingActionButton(
-    onPressed: () async {
-      String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        '#3D90F0',
-        'cancelButtonText',
-        false,
-        ScanMode.QR,
+  _scanButton(context) => FloatingActionButton(
+        onPressed: () async {
+          String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+            '#3D90F0',
+            'cancelButtonText',
+            false,
+            ScanMode.QR,
+          );
+          print(barcodeScanRes);
+
+          final scanListProvider = Provider.of<ScanListProvider>(
+            context,
+            listen: false,
+          );
+
+          scanListProvider.newScan(barcodeScanRes);
+        },
+        child: Icon(Icons.qr_code),
       );
-      print(barcodeScanRes);
-    },
-    child: Icon(Icons.qr_code),
-  );
 
   _bottomNavigationBar(UiProvider uiProvider) => BottomNavigationBar(
         currentIndex: uiProvider.selectedMenuOpt,
@@ -58,7 +66,7 @@ class HomePage extends StatelessWidget {
       appBar: _appBar,
       body: _HomePageBody(),
       bottomNavigationBar: _bottomNavigationBar(uiProvider),
-      floatingActionButton: _scanButton,
+      floatingActionButton: _scanButton(context),
     );
   }
 }
@@ -68,12 +76,18 @@ class _HomePageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final uiProvider = Provider.of<UiProvider>(context);
     final currentPage = uiProvider.selectedMenuOpt;
+    final scanListProvider = Provider.of<ScanListProvider>(
+      context,
+      listen: false,
+    );
 
     switch (currentPage) {
       case 1:
-        return AddressesPage();
+        scanListProvider.loadScans(tipo: 'website');
+        return ItemBuilderWidget(icon: Icons.home_work_outlined);
       default:
-        return MapsPage();
+        scanListProvider.loadScans(tipo: 'geo');
+        return ItemBuilderWidget(icon: Icons.map);
     }
   }
 }
