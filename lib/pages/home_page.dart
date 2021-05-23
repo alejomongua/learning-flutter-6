@@ -26,6 +26,7 @@ class HomePage extends StatelessWidget {
           );
 
           scanListProvider.newScan(barcodeScanRes);
+          Navigator.popAndPushNamed(context, 'home');
         },
         child: Icon(Icons.qr_code),
       );

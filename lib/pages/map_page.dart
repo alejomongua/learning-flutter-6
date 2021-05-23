@@ -16,18 +16,25 @@ class _MapPageState extends State<MapPage> {
         ModalRoute.of(context)!.settings.arguments as ScanModel;
     Completer<GoogleMapController> _controller = Completer();
 
+    final LatLng? _scanLatLng = scan!.getLatLon();
+
+    final LatLng latLng =
+        _scanLatLng == null ? LatLng(4.6736, -74.0819) : _scanLatLng;
+
     final CameraPosition _initialPoint = CameraPosition(
-      target: LatLng(4.6736, -74.0819),
+      target: latLng,
       zoom: 17,
+      tilt: 50,
     );
 
-    print(scan!.valor);
+    print(scan.valor);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Mapa'),
       ),
       body: GoogleMap(
+        myLocationButtonEnabled: false,
         mapType: MapType.normal,
         initialCameraPosition: _initialPoint,
         onMapCreated: (GoogleMapController controller) {
