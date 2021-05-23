@@ -10,6 +10,8 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  MapType _mapType = MapType.normal;
+
   @override
   Widget build(BuildContext context) {
     final ScanModel? scan =
@@ -27,18 +29,50 @@ class _MapPageState extends State<MapPage> {
       tilt: 50,
     );
 
+    final Set<Marker> markers = Set<Marker>();
+
+    markers.add(
+      Marker(
+        markerId: MarkerId('geo-location'),
+        position: latLng,
+      ),
+    );
+
     print(scan.valor);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Mapa'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.location_on),
+            onPressed: () async {
+              final GoogleMapController controller = await _controller.future;
+              controller
+                  .animateCamera(CameraUpdate.newCameraPosition(_initialPoint));
+            },
+          )
+        ],
       ),
       body: GoogleMap(
         myLocationButtonEnabled: false,
-        mapType: MapType.normal,
+        markers: markers,
+        mapType: _mapType,
         initialCameraPosition: _initialPoint,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.layers),
+        onPressed: () {
+          setState(() {
+            if (_mapType == MapType.normal) {
+              _mapType = MapType.satellite;
+            } else {
+              _mapType = MapType.normal;
+            }
+          });
         },
       ),
     );
