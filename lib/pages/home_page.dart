@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+// import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 import 'package:provider/provider.dart';
 
@@ -8,28 +8,18 @@ import 'package:qr_reader/providers/ui_provider.dart';
 import 'package:qr_reader/widgets/item_builder_widget.dart';
 
 class HomePage extends StatelessWidget {
-  final _appBar = AppBar(
-    title: Center(
-      child: Text('Historial'),
-    ),
-    actions: [
-      IconButton(
-        icon: Icon(Icons.delete),
-        onPressed: () {},
-      )
-    ],
-  );
-
   _scanButton(context) => FloatingActionButton(
         onPressed: () async {
+          /*
           String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
             '#3D90F0',
             'cancelButtonText',
             false,
             ScanMode.QR,
           );
-          print(barcodeScanRes);
-
+          */
+          String barcodeScanRes = 'geo:4.6736, -74.0819';
+          // print(barcodeScanRes);
           final scanListProvider = Provider.of<ScanListProvider>(
             context,
             listen: false,
@@ -60,10 +50,26 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final uiProvider = Provider.of<UiProvider>(context);
+    final scanListProvider = Provider.of<ScanListProvider>(
+      context,
+      listen: false,
+    );
     print(uiProvider.selectedMenuOpt);
 
     return Scaffold(
-      appBar: _appBar,
+      appBar: AppBar(
+        title: Center(
+          child: Text('Historial'),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              scanListProvider.deleteScans();
+            },
+          )
+        ],
+      ),
       body: _HomePageBody(),
       bottomNavigationBar: _bottomNavigationBar(uiProvider),
       floatingActionButton: _scanButton(context),
@@ -84,10 +90,10 @@ class _HomePageBody extends StatelessWidget {
     switch (currentPage) {
       case 1:
         scanListProvider.loadScans(tipo: 'website');
-        return ItemBuilderWidget(icon: Icons.home_work_outlined);
+        return ItemBuilderWidget(tipo: 'website');
       default:
         scanListProvider.loadScans(tipo: 'geo');
-        return ItemBuilderWidget(icon: Icons.map);
+        return ItemBuilderWidget(tipo: 'geo');
     }
   }
 }

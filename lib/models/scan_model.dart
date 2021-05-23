@@ -10,9 +10,9 @@ class ScanModel {
     this.tipo,
   }) {
     if (this.valor.startsWith('http')) {
-      this.valor = 'website';
+      this.tipo = 'website';
     } else {
-      this.valor = 'geo';
+      this.tipo = 'geo';
     }
   }
 
